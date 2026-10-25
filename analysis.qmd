@@ -50,6 +50,10 @@ score_change |>
   ggplot(aes(x = rla_change, fill = after_stat(x >= 0))) +
   geom_histogram(boundary = 0) +
   geom_vline(xintercept = 0) +
+  scale_fill_manual(
+    values = c("FALSE" = "#D55E00", "TRUE" = "#0072B2"),
+    labels = c("FALSE" = "Negative", "TRUE" = "Positive")
+  ) +
   labs(
     title = "Change in District Reading Scores",
     subtitle = paste("Districts with data in both years:", nrow(score_change)),
@@ -57,5 +61,28 @@ score_change |>
     y = "Number of districts",
     fill = "Change",
     caption = "Positive values indicate improvement; negative values indicate decline."
+  )
+```
+
+```{r}
+state_change |>
+  mutate(
+    state_name = fct_reorder(state_name, rla_2023),
+    direction = if_else(rla_2023 >= rla_2015, "Positive", "Negative")
+  ) |>
+  ggplot(aes(y = state_name)) +
+  geom_segment(
+    aes(x = rla_2015, xend = rla_2023, yend = state_name, color = direction),
+    arrow = grid::arrow(length = unit(0.12, "inches"))
+  ) +
+  geom_point(aes(x = rla_2015), color = "gray60") +
+  scale_color_manual(values = c("Negative" = "#D55E00", "Positive" = "#0072B2")) +
+  labs(
+    title = "State Reading Scores: 2015 to 2023",
+    subtitle = "Arrows show the direction and size of each state's score change",
+    x = "Reading score",
+    y = NULL,
+    color = "Change",
+    caption = "Gray dots mark 2015 scores; arrowheads mark 2023 scores."
   )
 ```
